@@ -1,0 +1,39 @@
+version: "3"
+
+services:
+ opentsdb:
+    image: my_opentsdb
+    ports:
+      - 4242:4242
+    networks:
+      - my_network
+    deploy:
+      restart_policy:
+        condition: on-failure
+ db_adapter:
+    image: adapter
+    # ports:
+    #   - 5000:5000
+    networks:
+      - my_network
+    depends_on:
+      - opentsdb
+    deploy:
+      restart_policy:
+        condition: on-failure
+ grafana:
+    image: grafana/grafana:5.3.2
+    ports:
+      - 3000:3000
+    networks:
+      - my_network
+    deploy:
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - opentsdb
+    environment:
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+
+networks:
+ my_network:
